@@ -1,5 +1,4 @@
 export type configuration = {
-  port: number;
   jwtSecret: string;
   pgDB: {
     host: string;
@@ -11,7 +10,6 @@ export type configuration = {
 }
 
 export let config: configuration = {
-  port: 3000,
   jwtSecret: 'secret',
   pgDB: {
     host: 'localhost',
@@ -24,7 +22,6 @@ export let config: configuration = {
 
 export function applyConfigFromEnv(): configuration {
   config = {
-    port: process.env.PORT ? parseInt(process.env.PORT) : config.port,
     jwtSecret: process.env.JWT_SECRET || config.jwtSecret,
     pgDB: {
       port: process.env.PG_PORT ? parseInt(process.env.PG_PORT) : config.pgDB.port,
