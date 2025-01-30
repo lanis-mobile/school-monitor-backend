@@ -1,4 +1,4 @@
-import { Router } from "express";
+import {ErrorRequestHandler, Router} from "express";
 import type { Request, Response, NextFunction } from "express";
 import { query } from 'express-validator';
 import * as OTPAuth from "otpauth";
@@ -8,6 +8,13 @@ import {IJwt} from "./interfaces/IJwt";
 import {IAccount} from "./interfaces/IAccount";
 
 const api = Router();
+
+const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    return Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
+
 
 async function authenticated(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (!req.headers.authorization?.startsWith('Bearer ')) {
@@ -34,16 +41,16 @@ async function authenticated(req: Request, res: Response, next: NextFunction): P
   next();
 }
 
-api.post('/log-login', query(['schoolid', 'versioncode']), async (req: Request, res: Response) => {
+api.post('/log-login', query(['schoolid', 'versioncode']), asyncHandler(async (req: Request, res: Response) => {
   // @ts-ignore
   await sql`
     insert into sph_logins (school_id, app_version_code)
     values (${req.query.schoolid}, ${req.query.versioncode})
   `;
   res.status(200).end();
-});
+}) );
 
-api.post('/login', query(['username', 'totp']), async (req: Request, res: Response) => {
+api.post('/login', query(['username', 'totp']), asyncHandler(async (req: Request, res: Response) => {
   if (!req.query.username || !req.query.totp) {
     res.sendStatus(400);
     return;
@@ -73,13 +80,13 @@ api.post('/login', query(['username', 'totp']), async (req: Request, res: Respon
   }, 'secret');
   res.write(token);
   res.end();
-});
+}));
 
-api.post('/auth-test', authenticated, (req: Request, res: Response) => {
+api.post('/auth-test', authenticated, asyncHandler(async (req: Request, res: Response) => {
   res.send(req.user);
-});
+}));
 
-api.post('/user', authenticated, query('username'), async (req: Request, res: Response) => {
+api.post('/user', authenticated, query('username'), asyncHandler(async (req: Request, res: Response) => {
   if (!req.user?.admin) {
     res.status(401).end();
     return;
@@ -103,9 +110,9 @@ api.post('/user', authenticated, query('username'), async (req: Request, res: Re
   const url = `otpauth://totp/Lanis-Mobile-Monitor:${req.query.username}?issuer=Lanis-Mobile-Monitor&secret=${secret}&algorithm=SHA1&digits=6&period=30`
 
   res.send(url);
-});
+}));
 
-api.delete('/user', authenticated, query('username'), async (req: Request, res: Response) => {
+api.delete('/user', authenticated, query('username'), asyncHandler(async (req: Request, res: Response) => {
   if (!req.user?.admin) {
     res.status(401).end();
     return;
@@ -125,9 +132,9 @@ api.delete('/user', authenticated, query('username'), async (req: Request, res: 
   }
 
   res.status(200).end();
-});
+}));
 
-api.get('/users', authenticated, async (req: Request, res: Response) => {
+api.get('/users', authenticated, asyncHandler(async (req: Request, res: Response) => {
   if (!req.user?.admin) {
     res.status(401).end();
     return;
@@ -137,9 +144,9 @@ api.get('/users', authenticated, async (req: Request, res: Response) => {
     select (id, github_username, admin, created_at, last_login) from accounts
   `;
   res.json(users);
-});
+}));
 
-api.get('/data', authenticated, query(['startTime', 'endTime']), async (req: Request, res: Response) => {
+api.get('/data', authenticated, query(['startTime', 'endTime']), asyncHandler(async (req: Request, res: Response) => {
   // @ts-ignore
   const data = await sql`
       SELECT
@@ -166,6 +173,16 @@ api.get('/data', authenticated, query(['startTime', 'endTime']), async (req: Req
   }, {});
 
   res.json(groupedData);
+}));
+
+api.get('/testerror', asyncHandler(async (_req: Request, _res: Response) => {
+    throw Error('testerror');
+}));
+
+api.use((err: ErrorRequestHandler, req: Request, res: Response, _next: NextFunction) => {
+  res.status(500);
+  res.end();
 });
+
 
 export default api;
