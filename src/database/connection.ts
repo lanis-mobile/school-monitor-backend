@@ -6,7 +6,7 @@ const sql = postgres({
   ssl: 'prefer',
 });
 
-sql.unsafe(`
+sql`
     CREATE TABLE IF NOT EXISTS accounts
     (
         id
@@ -24,22 +24,14 @@ sql.unsafe(`
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-
+    CREATE TYPE platform AS ENUM ('android', 'iOS', 'unspecified');
     CREATE TABLE IF NOT EXISTS sph_logins
     (
-        id
-        SERIAL
-        UNIQUE
-        PRIMARY
-        KEY,
-        school_id
-        INT,
-        app_version_code
-        SMALLINT,
-        time
-        TIMESTAMP
-        DEFAULT
-        CURRENT_TIMESTAMP
+        id SERIAL UNIQUE PRIMARY KEY,
+        school_id INT,
+        app_version_code SMALLINT,
+        app_platform platform DEFAULT 'unspecified',
+        time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE
@@ -52,6 +44,6 @@ $$
     END;
 $$
     LANGUAGE plpgsql;
-`)
+`;
 
 export default sql;

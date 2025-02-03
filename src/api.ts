@@ -41,14 +41,14 @@ async function authenticated(req: Request, res: Response, next: NextFunction): P
   next();
 }
 
-api.post('/log-login', query(['schoolid', 'versioncode']), asyncHandler(async (req: Request, res: Response) => {
+api.post('/log-login', query(['schoolid', 'versioncode', 'date']), asyncHandler(async (req: Request, res: Response) => {
   // @ts-ignore
   await sql`
-    insert into sph_logins (school_id, app_version_code)
-    values (${req.query.schoolid}, ${req.query.versioncode})
+    insert into sph_logins (school_id, app_version_code, time)
+    values (${req.query.schoolid}, ${req.query.versioncode}, ${req.query.date})
   `;
   res.status(200).end();
-}) );
+}));
 
 api.post('/login', query(['username', 'totp']), asyncHandler(async (req: Request, res: Response) => {
   if (!req.query.username || !req.query.totp) {
@@ -72,13 +72,14 @@ api.post('/login', query(['username', 'totp']), asyncHandler(async (req: Request
     res.status(401).end();
     return;
   }
-  const token = jwt.sign({
+  const data = {
     account_id: user.id,
     admin: user.admin,
     created_at: new Date(),
     expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24) // 24 hours
-  }, 'secret');
-  res.write(token);
+  };
+  const token = jwt.sign(data, 'secret');
+  res.json({token, user: data});
   res.end();
 }));
 
@@ -168,12 +169,27 @@ api.get('/data', authenticated, query(['startTime', 'endTime']), asyncHandler(as
     if (!acc[row.school_id]) {
       acc[row.school_id] = [];
     }
-    acc[row.school_id].push(row);
+    acc[row.school_id].push({
+      day: row.day.toISOString().slice(0, 10),
+      entry_count: Number(row.entry_count)
+    });
     return acc;
   }, {});
 
-  res.json(groupedData);
+  res.json({
+    data: groupedData,
+    uniqueDaysInOrder: [...new Set(data.map((row: any) => row.day.toISOString().slice(0, 10)))]
+  });
 }));
+
+let schoolList: any[] = [];
+api.get('/lanis-school-list', asyncHandler(async (_req: Request, res: Response) => {
+  if (schoolList.length === 0) {
+   let response = await fetch('https://startcache.schulportal.hessen.de/exporteur.php?a=schoollist');
+    schoolList = await response.json();
+  }
+  res.json(schoolList);
+}))
 
 api.get('/testerror', asyncHandler(async (_req: Request, _res: Response) => {
     throw Error('testerror');
