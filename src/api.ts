@@ -195,6 +195,10 @@ api.get('/testerror', asyncHandler(async (_req: Request, _res: Response) => {
     throw Error('testerror');
 }));
 
+api.get('/ping', asyncHandler(async (_req: Request, res: Response) => {
+  res.send('pong');
+}));
+
 api.use((err: ErrorRequestHandler, req: Request, res: Response, _next: NextFunction) => {
   res.status(500);
   res.end();
