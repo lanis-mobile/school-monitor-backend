@@ -1,11 +1,12 @@
+import { applyConfigFromEnv } from './config';
+applyConfigFromEnv();
+
 import express from 'express';
 import { Request, Response } from 'express';
 import cors from 'cors';
 import api from './api';
-import { applyConfigFromEnv } from './config';
 const app = express();
 
-applyConfigFromEnv();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

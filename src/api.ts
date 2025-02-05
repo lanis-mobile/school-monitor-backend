@@ -66,7 +66,7 @@ api.post('/login', query(['username', 'totp']), asyncHandler(async (req: Request
     algorithm: 'SHA1',
     digits: 6,
     period: 30,
-    secret: OTPAuth.Secret.fromUTF8(user.totp_secret)
+    secret: OTPAuth.Secret.fromBase32(user.totp_secret)
   });
   if (totp.generate() !== req.query.totp) {
     res.status(401).end();
@@ -101,14 +101,14 @@ api.post('/user', authenticated, query('username'), asyncHandler(async (req: Req
   let secret = new OTPAuth.Secret({ size: 20 });
 
   const users = await sql`
-    insert into accounts (github_username, totp_secret) values (${req.query.username as string}, ${secret.utf8})
+    insert into accounts (github_username, totp_secret) values (${req.query.username as string}, ${secret.base32})
   `;
   if (users.count === 0) {
     res.status(500).end();
     return;
   }
 
-  const url = `otpauth://totp/Lanis-Mobile-Monitor:${req.query.username}?issuer=Lanis-Mobile-Monitor&secret=${secret}&algorithm=SHA1&digits=6&period=30`
+  const url = `otpauth://totp/Lanis-Mobile-Monitor:${req.query.username}?issuer=Lanis-Mobile-Monitor&secret=${secret.base32}&algorithm=SHA1&digits=6&period=30`
 
   res.send(url);
 }));
@@ -200,6 +200,7 @@ api.get('/ping', asyncHandler(async (_req: Request, res: Response) => {
 }));
 
 api.use((err: ErrorRequestHandler, req: Request, res: Response, _next: NextFunction) => {
+  console.error(err)
   res.status(500);
   res.end();
 });
