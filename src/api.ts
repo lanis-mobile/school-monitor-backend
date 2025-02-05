@@ -41,11 +41,11 @@ async function authenticated(req: Request, res: Response, next: NextFunction): P
   next();
 }
 
-api.post('/log-login', query(['schoolid', 'versioncode', 'date']), asyncHandler(async (req: Request, res: Response) => {
+api.post('/log-login', query(['schoolid', 'versioncode']), asyncHandler(async (req: Request, res: Response) => {
   // @ts-ignore
   await sql`
-    insert into sph_logins (school_id, app_version_code, time)
-    values (${req.query.schoolid}, ${req.query.versioncode}, ${req.query.date})
+    insert into sph_logins (school_id, app_version_code)
+    values (${req.query.schoolid}, ${req.query.versioncode})
   `;
   res.status(200).end();
 }));
