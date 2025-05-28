@@ -50,21 +50,22 @@ async function getSchool(schoolID: string) {
 
 
 api.post('/log-login', query(['schoolid', 'versioncode', 'platform']), r(async (req: Request, res: Response) => {
+  console.log(req.query);
   let schoolID = req.query.schoolid as string;
   let versionCode = req.query.versioncode as string;
   let platform = req.query.platform as string || 'unknown';
-  if (req.headers['user-agent'] !== 'Lanis Mobile' || !schoolID || !versionCode) {
-    res.status(200).end();
+  if (req.headers['user-agent'] !== 'Lanis-Mobile' || !schoolID || !versionCode) {
+    res.status(200).end('Wrote nothing...');
   }
   let school = await getSchool(schoolID);
-  let dataPoint = new Point('logins')
+  let dataPoint = new Point('clientloginmesurement')
   dataPoint.tag('school_id', schoolID || 'unknown')
-  dataPoint.tag('school_name', school?.name || 'unknown')
-  dataPoint.tag('school_city', school?.city || 'unknown')
-  dataPoint.tag('school_bezirk', school?.bezirk || 'unknown')
   dataPoint.tag('school_bezirk_id', school?.bezirk_id || 'unknown')
   dataPoint.tag('version_code', versionCode || 'unknown')
   dataPoint.tag('platform', platform || 'unknown')
+  dataPoint.stringField('school_name', school?.name || 'unknown')
+  dataPoint.stringField('school_city', school?.city || 'unknown')
+  dataPoint.stringField('school_bezirk', school?.bezirk || 'unknown')
 
   influxWrite.writePoint(dataPoint)
 
