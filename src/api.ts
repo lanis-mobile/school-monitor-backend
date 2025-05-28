@@ -50,7 +50,6 @@ async function getSchool(schoolID: string) {
 
 
 api.post('/log-login', query(['schoolid', 'versioncode', 'platform']), r(async (req: Request, res: Response) => {
-  console.log(req.query);
   let schoolID = req.query.schoolid as string;
   let versionCode = req.query.versioncode as string;
   let platform = req.query.platform as string || 'unknown';
