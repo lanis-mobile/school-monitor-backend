@@ -62,9 +62,9 @@ api.post('/log-login', query(['schoolid', 'versioncode', 'platform']), r(async (
   dataPoint.tag('school_bezirk_id', school?.bezirk_id || 'unknown')
   dataPoint.tag('version_code', versionCode || 'unknown')
   dataPoint.tag('platform', platform || 'unknown')
-  dataPoint.tag('school_name', school?.name || 'unknown')
-  dataPoint.tag('school_city', school?.city || 'unknown')
-  dataPoint.tag('school_bezirk', school?.bezirk || 'unknown')
+  dataPoint.stringField('school_name', school?.name || 'unknown')
+  dataPoint.stringField('school_city', school?.city || 'unknown')
+  dataPoint.stringField('school_bezirk', school?.bezirk || 'unknown')
 
   influxWrite.writePoint(dataPoint)
 
