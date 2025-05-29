@@ -58,6 +58,7 @@ api.post('/log-login', query(['schoolid', 'versioncode', 'platform']), r(async (
   }
   let school = await getSchool(schoolID);
   let dataPoint = new Point('clientloginmesurement')
+  dataPoint.tag('school', `${schoolID} ${school?.name ?? ""}`.trimEnd() || 'unknown')
   dataPoint.tag('school_id', schoolID || 'unknown')
   dataPoint.tag('school_bezirk_id', school?.bezirk_id || 'unknown')
   dataPoint.tag('version_code', versionCode || 'unknown')
