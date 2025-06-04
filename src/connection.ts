@@ -1,5 +1,5 @@
 import {InfluxDB} from "@influxdata/influxdb-client";
-import {config} from "../config";
+import {config} from "./config";
 
 const influx = new InfluxDB({
   // this connection is only used for server-internal data transfers, so http is fine
@@ -12,6 +12,6 @@ setInterval(async () => {
   await influxWrite.flush().catch(err => {
     console.error('Error flushing InfluxDB write API:', err);
   });
-}, 60 * 1000); // Flush every minute
+}, 60 * 500); // Flush every half a minute
 
 export default influxWrite;

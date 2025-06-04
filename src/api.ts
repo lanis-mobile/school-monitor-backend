@@ -2,7 +2,7 @@ import {ErrorRequestHandler, Router} from "express";
 import type { Request, Response, NextFunction } from "express";
 import { query } from 'express-validator';
 import {Point} from "@influxdata/influxdb-client";
-import influxWrite from "./database/connection";
+import influxWrite from "./connection";
 
 const api = Router();
 
@@ -28,7 +28,11 @@ let schoolList: {
   schools: []
 };
 async function getSchool(schoolID: string) {
-  if (schoolList.schools.length === 0 || !schoolList.timestamp || new Date().getTime() - schoolList.timestamp.getTime() > 2 * 60 * 60 * 1000) {
+  if (
+    schoolList.schools.length === 0 ||
+    !schoolList.timestamp ||
+    new Date().getTime() - schoolList.timestamp.getTime() > 2 * 60 * 60 * 1000
+  ) {
     let response = await fetch('https://startcache.schulportal.hessen.de/exporteur.php?a=schoollist');
     let responseJson = await response.json();
     let converted = responseJson.map((bezirk: any) => {
@@ -43,11 +47,11 @@ async function getSchool(schoolID: string) {
       })
     });
     schoolList.schools = converted.flat();
+    schoolList.timestamp = new Date();
   }
   let result = schoolList.schools.find(school => school.id === schoolID);
   return result || null;
 }
-
 
 api.post('/log-login', query(['schoolid', 'versioncode', 'platform']), r(async (req: Request, res: Response) => {
   let schoolID = req.query.schoolid as string;
