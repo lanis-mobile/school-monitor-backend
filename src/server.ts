@@ -4,6 +4,7 @@ checkConfig();
 import express from 'express';
 import { Request, Response } from 'express';
 import api from './api';
+import {influxInterval} from "./connection";
 const app = express();
 
 
@@ -15,6 +16,14 @@ app.get('*', (_req: Request, res: Response) => {
   res.redirect('https://lanis-mobile.github.io');
 });
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
   console.log('Application started on port 3000!');
 }, );
+
+
+process.on('SIGINT', () => {
+  console.log("got SIGINT, exiting server...")
+  server.close()
+  server.closeAllConnections()
+  clearInterval(influxInterval)
+})
