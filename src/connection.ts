@@ -8,10 +8,11 @@ const influx = new InfluxDB({
 
 const influxWrite = influx.getWriteApi(config.influx.org, config.influx.bucket, 's')
 
-setInterval(async () => {
+const influxInterval = setInterval(async () => {
   await influxWrite.flush().catch(err => {
     console.error('Error flushing InfluxDB write API:', err);
   });
 }, 60 * 500); // Flush every half a minute
 
 export default influxWrite;
+export {influxInterval}
