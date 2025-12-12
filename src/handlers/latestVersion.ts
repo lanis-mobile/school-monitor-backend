@@ -11,6 +11,13 @@ export type availableVersionsResponse = {
         versionCode: number;
       };
   playStoreVersion: string;
+  github: {
+    latestVersion: string;
+    isPreRelease: boolean;
+    body: string;
+    createdAt: string;
+    publishedAt: string;
+  } | null;
   timestamp: Date;
 };
 
@@ -18,6 +25,7 @@ let lastAvailableVersion: availableVersionsResponse = {
   latestIOSVersion: "unknown",
   izzyOnDroidVersion: "unknown",
   playStoreVersion: "unknown",
+  github: null,
   timestamp: new Date(),
 };
 
@@ -25,10 +33,9 @@ let lastAvailableVersion: availableVersionsResponse = {
 export async function getLatestVersions() {
   const refreshRequired =
     new Date().getTime() - lastAvailableVersion.timestamp.getTime() >
-    1000 * 60 * 10;
+      1000 * 60 * 10 || lastAvailableVersion.github === null;
 
   if (refreshRequired) {
-    // return cached value and run fetcher in background
     setTimeout(async () => {
       lastAvailableVersion = await fetchLatestVersions();
     }, 0);
@@ -53,11 +60,23 @@ async function fetchLatestVersions(): Promise<availableVersionsResponse> {
     izzyJson.packages[0] || izzyJson.suggestedVersionCode || "unknown";
 
   const playStoreResponse = await gplay.app({ appId: APP_ID });
+  const playStoreVersion = playStoreResponse.version || "unknown";
 
+  const githubResponse = await fetch(
+    "https://api.github.com/repos/lanis-mobile/lanis/releases/latest",
+  );
+  const githubResponseJson = await githubResponse.json();
   return {
     latestIOSVersion: itunesVersion,
     izzyOnDroidVersion: izzyOnDroidVersion,
-    playStoreVersion: playStoreResponse.version || "unknown",
+    playStoreVersion: playStoreVersion,
+    github: {
+      body: githubResponseJson.body,
+      createdAt: githubResponseJson.created_at,
+      latestVersion: githubResponseJson.tag_name,
+      isPreRelease: githubResponseJson.prerelease,
+      publishedAt: githubResponseJson.published_at,
+    },
     timestamp: new Date(),
   };
 }
