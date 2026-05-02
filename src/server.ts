@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/api", api);
 
-app.get("*", (_req: Request, res: Response) => {
+app.get("*splat", (_req: Request, res: Response) => {
   res.redirect("https://lanis-mobile.github.io");
 });
 
