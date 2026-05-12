@@ -1,6 +1,6 @@
 {
   "name": "school-monitor-backend",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./dist/server.js",
   "scripts": {
     "start": "nodemon ./src/server.ts",
@@ -12,22 +12,23 @@
   "license": "",
   "description": "",
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.12.0",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
-    "@typescript-eslint/parser": "^8.22.0",
-    "eslint": "^9.19.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.3",
-    "nodemon": "^3.1.9",
-    "prettier": "^3.4.2",
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.17",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2"
   },
   "dependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
-    "express": "^4.21.2",
-    "express-validator": "^7.3.1",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
     "google-play-scraper": "^10.1.2"
   }
 }
