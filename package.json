@@ -12,23 +12,23 @@
   "license": "",
   "description": "",
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
-    "@types/node": "^22.19.17",
-    "eslint": "^10.3.0",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-prettier": "^5.5.7",
     "nodemon": "^3.1.14",
-    "prettier": "^3.8.3",
+    "prettier": "^3.10.1",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.2"
+    "typescript-eslint": "^8.72.2"
   },
   "dependencies": {
     "@influxdata/influxdb-client": "^1.35.0",
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "express-validator": "^7.3.2",
-    "google-play-scraper": "^10.1.2"
+    "google-play-scraper": "^10.1.4"
   }
 }

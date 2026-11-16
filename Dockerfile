@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /build
 
@@ -18,7 +18,7 @@ RUN npm ci --omit=dev --audit=false --fund=false
 
 ######################################################################
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
